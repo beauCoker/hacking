@@ -1,5 +1,5 @@
 Package: hacking
-Title: What the Package Does (One Line, Title Case)
+Title: Statistical Inference for Ensuring the Robustness of Scientific Results
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Coker",
