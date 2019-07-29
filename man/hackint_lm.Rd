@@ -4,7 +4,8 @@
 \alias{hackint_lm}
 \title{Hacking intervals for linear models}
 \usage{
-hackint_lm(mdl, data, theta = 0.05, verbose = TRUE)
+hackint_lm(mdl, data, theta = 0.05, frac_remove_obs = 1,
+  verbose = TRUE)
 }
 \arguments{
 \item{mdl}{model}
@@ -12,6 +13,8 @@ hackint_lm(mdl, data, theta = 0.05, verbose = TRUE)
 \item{data}{dataframe}
 
 \item{theta}{numeric}
+
+\item{frac_remove_obs}{numeric}
 
 \item{verbose}{boolean}
 }

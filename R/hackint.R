@@ -3,6 +3,7 @@
 #' @param mdl model
 #' @param data dataframe
 #' @param theta numeric
+#' @param frac_remove_obs numeric
 #' @param verbose boolean
 #'
 #' @return list
@@ -10,7 +11,7 @@
 #' @importFrom magrittr "%>%"
 #'
 #' @examples
-hackint_lm <- function(mdl, data, theta = 0.05, verbose=TRUE) {
+hackint_lm <- function(mdl, data, theta = 0.05, frac_remove_obs = 1, verbose=TRUE) {
 
   formula_0 <- stats::update(stats::as.formula(mdl$call$formula), .~.)
 
@@ -39,7 +40,14 @@ hackint_lm <- function(mdl, data, theta = 0.05, verbose=TRUE) {
                                  term2 = t(utils::combn(terms_linear_included,2))[,2], stringsAsFactors = FALSE) %>%
     dplyr::mutate(manipulation = sprintf("Adding %s:%s term", term1, term2))
 
-  hacks_obs = data.frame(type='remove_obs', row_idx = 1:n_obs, stringsAsFactors = FALSE) %>%
+  # Remove observations
+  if (frac_remove_obs == 1){
+    remove_obs_idx <- 1:n_obs
+  } else {
+    remove_obs_idx <- order(cooks.distance(mdl), decreasing = TRUE)[1:round(frac_remove_obs*n_obs)]
+  }
+
+  hacks_obs = data.frame(type='remove_obs', row_idx = remove_obs_idx, stringsAsFactors = FALSE) %>%
     dplyr::mutate(manipulation = paste0("Remove observation ",row_idx))
 
   # Base model fit
