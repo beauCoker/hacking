@@ -1,11 +1,11 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-**NOTE: This is a toy package created for expository purposes. The code is not intended to be used for any purpose**
+**NOTE: This is a toy package created for expository purposes. It is not intended to be used for any other purpose.**
 
 ### Hacking intervals
 
 \[Stuff about hacking intervals, to be improved\]
 
-There two types of hacking intervals:
+There are two types of hacking intervals:
 
 -   **Prescriptively constrained** hacking intervals give the range of results that could be achieved subject to user specified constraints.
 -   **Tethered** hacking intervals compute range of results that could be achieved subject to *any* manipulation so long as the loss changes by only a small amount.
