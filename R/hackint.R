@@ -26,27 +26,27 @@ hackint_lm <- function(mdl, data, theta = 0.05, verbose=TRUE) {
 
   # Number of hacked models to run based on user options
   hacks_add_term = data.frame(type='add_term', var_name = vars_excluded, stringsAsFactors = FALSE) %>%
-    dplyr::mutate(modification = paste0("Add variable ",var_name))
+    dplyr::mutate(manipulation = paste0("Add variable ",var_name))
 
   hacks_remove_term = data.frame(type='remove_term', term = terms_included, stringsAsFactors = FALSE) %>%
-    dplyr::mutate(modification = paste0("Remove term ",term))
+    dplyr::mutate(manipulation = paste0("Remove term ",term))
 
   hacks_transformation = data.frame(type='transformation', term = terms_linear_included, stringsAsFactors = FALSE) %>%
-    dplyr::mutate(modification = paste0("Square variable ",term))
+    dplyr::mutate(manipulation = paste0("Square variable ",term))
 
   hacks_interaction = data.frame(type='interaction',
                                  term1 = t(utils::combn(terms_linear_included,2))[,1],
                                  term2 = t(utils::combn(terms_linear_included,2))[,2], stringsAsFactors = FALSE) %>%
-    dplyr::mutate(modification = sprintf("Adding %s:%s term", term1, term2))
+    dplyr::mutate(manipulation = sprintf("Adding %s:%s term", term1, term2))
 
   hacks_obs = data.frame(type='remove_obs', row_idx = 1:n_obs, stringsAsFactors = FALSE) %>%
-    dplyr::mutate(modification = paste0("Remove observation ",row_idx))
+    dplyr::mutate(manipulation = paste0("Remove observation ",row_idx))
 
   # Base model fit
   SSE_0 <- sum(mdl$residuals^2)
   beta_0 = mdl$coefficients['w']
 
-  hi_0 <- tethered_lm(mdl)
+  hi_0 <- tethered_lm(mdl, theta)
 
   # Add term ----------
   hacks_add_term <- hacks_add_term %>%
@@ -102,10 +102,13 @@ hackint_lm <- function(mdl, data, theta = 0.05, verbose=TRUE) {
            UB = purrr::map_dbl(hi,'UB')) %>%
     dplyr::select(-hi)
 
+  # Combine results ----------
   hacks_all <- dplyr::bind_rows(hacks_add_term, hacks_remove_term, hacks_interaction, hacks_transformation, hacks_obs) %>%
-    dplyr::select(type, modification, LB, Estimate, UB) %>%
+    dplyr::select(type, manipulation, LB, Estimate, UB) %>%
     dplyr::mutate(largest_diff = pmax(abs(beta_0-LB), abs(UB-beta_0))) %>%
-    dplyr::arrange(dplyr::desc(largest_diff))
+    dplyr::arrange(dplyr::desc(largest_diff)) %>%
+    select(modification, everything())
+
 
   # Print results ----------
 
@@ -113,36 +116,36 @@ hackint_lm <- function(mdl, data, theta = 0.05, verbose=TRUE) {
     data.frame(
       result = 'Tethered (LB):',
       value=hi_0['LB'],
-      modification=NA,
+      manipulation=NA,
       stringsAsFactors = FALSE
     ),
 
     data.frame(
       result = 'Tethered (UB):',
       value=hi_0['UB'],
-      modification=NA,
+      manipulation=NA,
       stringsAsFactors = FALSE
     ),
 
     hacks_all %>%
       dplyr::top_n(-1, Estimate) %>%
       dplyr::mutate(result = 'Constrained (LB):') %>%
-      dplyr::select(result, value=Estimate, modification),
+      dplyr::select(result, value=Estimate, manipulation),
 
     hacks_all %>%
       dplyr::top_n(1, Estimate) %>%
       dplyr::mutate(result = 'Constrained (UB):') %>%
-      dplyr::select(result, value=Estimate, modification),
+      dplyr::select(result, value=Estimate, manipulation),
 
     hacks_all %>%
       dplyr::top_n(-1, LB) %>%
       dplyr::mutate(result = 'Constrained+Tethered (LB):') %>%
-      dplyr::select(result, value=LB, modification),
+      dplyr::select(result, value=LB, manipulation),
 
     hacks_all %>%
       dplyr::top_n(1, UB) %>%
       dplyr::mutate(result = 'Constrained+Tethered (UB):') %>%
-      dplyr::select(result, value=UB, modification)
+      dplyr::select(result, value=UB, manipulation)
 
   )
 

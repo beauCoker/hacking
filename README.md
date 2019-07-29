@@ -3,8 +3,6 @@
 
 ### Hacking intervals
 
-\[Stuff about hacking intervals, to be improved\]
-
 There are two types of hacking intervals:
 
 -   **Prescriptively constrained** hacking intervals give the range of results that could be achieved subject to user specified constraints.
@@ -27,58 +25,64 @@ devtools::install_github("beauCoker/hacking")
 
 ### Quick demo
 
-Sample data:
+Start with a datset. For this demo we'll generate a toy dataset `data`.
 
 ``` r
-N = 10
-Px = 3
-Pz = 3
+set.seed(0)
 
-set.seed(1)
+N = 50 # Number of observations
 data <- data.frame(
   y = rnorm(N), # Response variable (continuous)
   w = rbinom(N, 1, .5), # Treatment variable (binary)
-  X = matrix(rnorm(N*Px), nrow=N), # Covariates included in base model
-  Z = matrix(rnorm(N*Pz), nrow=N) # Covaraites excluded from base model
+  X = matrix(rnorm(N*3), nrow=N), # Covariates included in base model
+  Z = matrix(rnorm(N*3), nrow=N) # Covariates excluded from base model
 )
 ```
 
-Fit a linear base model with `lm` and examine the coefficient on the treatment variable:
+Next, fit a linear model with `lm`. We'll call this the "base" model.
 
 ``` r
 mdl <- lm(y ~ w + X.1*X.2, data=data)
 (beta_0 <- mdl$coefficients['w'])
 #>         w 
-#> -1.427219
+#> 0.2696223
 ```
 
-So, the OLS estimate for the coefficent `beta_0` on the treatment variable `w` is aboud -1.43. Now we compute the hacking interval around this value with `hacking_lm`, allowing for a `theta = 0.5` percent change in the loss:
+So, the ordinary least squares estimate for the coefficent `beta_0` on the treatment variable `w` is about 0.27. A standard question in statistics is to ask, "what could happen if I estimated `beta_0` using a different datset drawn from the same distribution?" This is what a standard confidence interval tells you. It can be computed with `R`'s built-in `confint` function:
+
+``` r
+(ci <- confint(mdl)['w',])
+#>      2.5 %     97.5 % 
+#> -0.2619048  0.8011494
+```
+
+Now we get to the hacking interval part. What if instead you ask, "what if the scientist that reported this estimate threw out some important observations, or messed with the data in some other way? What's the range of estimates that could have been reported?" This is what a hacking interval tells you. For linera models, it can be computed with the `hackint_lm` function in this package:
 
 ``` r
 library(hacking)
-output <- hackint_lm(mdl, data, theta=0.5)
-#>                       result      value         modification
-#> 1             Tethered (LB): -1.7418536                 <NA>
-#> 2             Tethered (UB): -1.1125835                 <NA>
-#> 3          Constrained (LB): -1.8613618 Remove observation 8
-#> 4          Constrained (UB): -0.6719029      Remove term X.1
-#> 5 Constrained+Tethered (LB): -2.9554841     Add variable Z.2
-#> 6 Constrained+Tethered (UB):  0.4130532 Remove observation 3
+output <- hackint_lm(mdl, data, theta=0.1)
+#>                       result      value          modification
+#> 1             Tethered (LB): -0.1262315                  <NA>
+#> 2             Tethered (UB):  0.6654762                  <NA>
+#> 3          Constrained (LB):  0.1675830 Remove observation 29
+#> 4          Constrained (UB):  0.3508530 Remove observation 13
+#> 5 Constrained+Tethered (LB): -0.4013983 Remove observation 29
+#> 6 Constrained+Tethered (UB):  0.9234986      Add variable Z.2
 ```
 
-This means that a tethered hacking interval around the base model is (-1.74, -1.11), a prescriptively constrained hacking interval around the base model is (-1.86, -0.67), and a hacking interval that considers both types is (-2.96, 0.41).
+The parameter `theta` tells you what percentage of loss is tolerated for tetehred hacking. `LB` and `UB` stand for lower bound and upper bound. This means that a tethered hacking interval around the base model is (-0.13, 0.67), a prescriptively constrained hacking interval around the base model is (0.17, 0.35), and a hacking interval that considers both types is (-0.4, 0.92). Notice either of the tethered intervals are wider than the standard confidence interval.
 
-Here is the full output, sorted by the largest difference from `beta_0`:
+`hackint_lm` also returns the full list of all the manipulations that were tried, the minimum-loss estimate `Estimate` for each manipulation, and the tethered hacking interval `(LB,UB)` around each. The output is sorted by the largest absolute difference `largest_diff` of any value (`LB`, `Estiamte`, or `UB`) from `beta_0`:
 
 ``` r
 head(output$hacks_all)
 #> # A tibble: 6 x 6
-#>   type        modification            LB Estimate      UB largest_diff
-#>   <chr>       <chr>                <dbl>    <dbl>   <dbl>        <dbl>
-#> 1 remove_obs  Remove observation 3 -2.12   -0.851  0.413          1.84
-#> 2 remove_term Remove term X.1      -1.75   -0.672  0.410          1.84
-#> 3 add_term    Add variable Z.2     -2.96   -1.78  -0.606          1.53
-#> 4 remove_obs  Remove observation 8 -2.93   -1.86  -0.793          1.50
-#> 5 remove_obs  Remove observation 1 -2.79   -1.54  -0.282          1.36
-#> 6 remove_term Remove term X.1:X.2  -2.34   -1.21  -0.0829         1.34
+#>   type       modification              LB Estimate    UB largest_diff
+#>   <chr>      <chr>                  <dbl>    <dbl> <dbl>        <dbl>
+#> 1 remove_obs Remove observation 29 -0.401    0.168 0.737        0.671
+#> 2 add_term   Add variable Z.2      -0.222    0.351 0.923        0.654
+#> 3 remove_obs Remove observation 35 -0.373    0.192 0.757        0.643
+#> 4 remove_obs Remove observation 13 -0.200    0.351 0.901        0.632
+#> 5 remove_obs Remove observation 3  -0.199    0.350 0.899        0.629
+#> 6 remove_obs Remove observation 30 -0.256    0.318 0.892        0.622
 ```
