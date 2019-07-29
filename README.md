@@ -10,7 +10,9 @@ There two types of hacking intervals:
 -   **Prescriptively constrained** hacking intervals give the range of results that could be achieved subject to user specified constraints.
 -   **Tethered** hacking intervals compute range of results that could be achieved subject to *any* manipulation so long as the loss changes by only a small amount.
 
-This package computes tethered and prescriptively constrained hacking intervals for linear models. Up to one of the following prescriptive constraints is considered at a time:
+This package computes tethered and prescriptively constrained hacking intervals, as well as an interval that considers both types of hacking, for linear models.
+
+For the prescriptively constrained hacking intervals, up to one of the following modifications is considered at once:
 
 -   Removing any additive term in the base model.
 -   Applying a transformation (currently `x^2` only) to any linear term included in the base model.
@@ -50,7 +52,7 @@ mdl <- lm(y ~ w + X.1*X.2, data=data)
 #> -1.427219
 ```
 
-The OLS estimate for the coefficent `beta_0` on the treatment variable `w` is -1.4272186. Compute the hacking interval around this value with `hacking_lm`:
+The OLS estimate for the coefficent `beta_0` on the treatment variable `w` is -1.4272186. Compute the hacking interval around this value with `hacking_lm`, allowing for a `theta = 0.5` percent change in the loss.
 
 ``` r
 library(hacking)
@@ -64,7 +66,9 @@ output <- hackint_lm(mdl, data, theta=0.5)
 #> 6 Constrained+Tethered (UB):  0.4130532 Remove observation 3
 ```
 
-Full output, sorted by the largest difference from `beta_0`:
+This means that a tethered hacking interval around the base model is (-1.74, -1.11), a prescriptively constrained hacking interval around the base model is (-1.86, -0.67), and a hacking interval that considers both types is (-2.96, 0.41).
+
+Here is the full output, sorted by the largest difference from `beta_0`:
 
 ``` r
 head(output$hacks_all)
