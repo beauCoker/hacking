@@ -52,7 +52,7 @@ mdl <- lm(y ~ w + X.1*X.2, data=data)
 #> -1.427219
 ```
 
-The OLS estimate for the coefficent `beta_0` on the treatment variable `w` is -1.4272186. Compute the hacking interval around this value with `hacking_lm`, allowing for a `theta = 0.5` percent change in the loss.
+So, the OLS estimate for the coefficent `beta_0` on the treatment variable `w` is aboud -1.43. Now we compute the hacking interval around this value with `hacking_lm`, allowing for a `theta = 0.5` percent change in the loss:
 
 ``` r
 library(hacking)
