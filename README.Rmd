@@ -21,10 +21,12 @@ knitr::opts_chunk$set(
 [Stuff about hacking intervals, to be improved]
 
 There two types of hacking intervals:
+
 * **Prescriptively constrained** hacking intervals give the range of results that could be achieved subject to user specified constraints.
 * **Tethered** hacking intervals compute range of results that could be achieved subject to *any* manipulation so long as the loss changes by only a small amount. 
 
 This package computes tethered and prescriptively constrained hacking intervals for linear models. Up to one of the following prescriptive constraints is considered at a time:
+
 * Removing any additive term in the base model.
 * Applying a transformation (currently `x^2` only) to any linear term included in the base model. 
 * Adding a linear term for any variable in the dataset. 
