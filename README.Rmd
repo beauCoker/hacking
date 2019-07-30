@@ -18,19 +18,24 @@ knitr::opts_chunk$set(
 
 ### Hacking intervals
 
-There are two types of hacking intervals:
+"Could a different reasonable researcher analyzing the same data come to a different conclusion?" This is a question that gets to the heart of whether or not a scientific result can be trusted, yet it's a question that traditional statistical inference has little to say about. 
 
-* **Prescriptively constrained** hacking intervals give the range of results that could be achieved subject to user specified constraints.
-* **Tethered** hacking intervals compute range of results that could be achieved subject to *any* manipulation so long as the loss changes by only a small amount. 
+We introduce the *hacking interval*, which is the range of a numerical scientific result that could be obtained over a set of reasonable dataset and hyperparameter manipulations. 
 
-This package computes tethered and prescriptively constrained hacking intervals, as well as an interval that considers both types of hacking, for linear models. 
+Hacking intervals come in two varieties:
 
-For the prescriptively constrained hacking intervals, up to one of the following modifications is considered at once:
+*	**Prescriptively-constrained** hacking intervals find the range of results over a user-defined set of reasonable manipulations. This provides explicit robustness to manipulations like:
+		+	Removing an outlier.
+		+	Adding/removing a feature.
+		+	Adding an interaction term. 
+		+	Adding a transformation of a feature (like `x^2`). 
+*	**Tethered** hacking intervals find the range of results over the set of models that fit the data well, supposing that each model could be obtained by an unidentified manipulation. This provides robustness to *any* manipulation, including ones difficult for optimization like:
+		+	Changing the values of covariates or outcomes. 
+		+	Removing any number of observations.
+		+	Adding new observations or new features.
+		+	Changing hyperparameters.  
 
-* Removing any additive term in the base model.
-* Applying a transformation (currently `x^2` only) to any linear term included in the base model. 
-* Adding a linear term for any variable in the dataset. 
-* Removing a single observation.
+This package computes tethered and prescriptively-constrained hacking intervals for linear models, as well as an interval that considers both types of hacking at once. 
 
 ### Installation
 
@@ -66,15 +71,14 @@ So, the ordinary least squares estimate for the coefficent `beta_0` on the treat
 (ci <- confint(mdl)['w',])
 ```
 
-Now we get to the hacking interval part. What if instead you ask, "what if the scientist that reported this estimate threw out some important observations, or messed with the data in some other way? What's the range of estimates that could have been reported?" This is what a hacking interval tells you. For linera models, it can be computed with the `hackint_lm` function in this package:
+Now we get to the hacking interval part. What if instead you ask, "what if the scientist that reported this estimate threw out some important observations, or messed with the data in some other way? What's the range of estimates that could have been reported?" This is what a hacking interval tells you. For linear models, it can be computed with the `hackint_lm` function in our package. The parameter `theta` tells you what percentage of loss is tolerated for tethered hacking.
 
 ```{r}
 library(hacking)
 output <- hackint_lm(mdl, data, theta=0.1)
 ```
 
-The parameter `theta` tells you what percentage of loss is tolerated for tetehred hacking. `LB` and `UB` stand for lower bound and upper bound. 
-This means that a tethered hacking interval around the base model is (`r round(output$tethered,2)`), a prescriptively constrained hacking interval around the base model is (`r round(output$constrained,2)`), and a hacking interval that considers both types is (`r round(output$tethered_and_constrained,2)`). Notice either of the tethered intervals are wider than the standard confidence interval. 
+In the output above, `LB` and `UB` stand for lower bound and upper bound. It says that a tethered hacking interval around the base model is (`r round(output$tethered,2)`), a prescriptively constrained hacking interval around the base model is (`r round(output$constrained,2)`), and a hacking interval that considers both types is (`r round(output$tethered_and_constrained,2)`). Notice either of the tethered intervals are wider than the standard confidence interval. 
 
 `hackint_lm` also returns the full list of all the manipulations that were tried, the minimum-loss estimate `Estimate` for each manipulation, and the tethered hacking interval `(LB,UB)` around each. The output is sorted by the largest absolute difference `largest_diff` of any value (`LB`, `Estiamte`, or `UB`) from `beta_0`:
 
