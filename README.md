@@ -9,8 +9,19 @@ We introduce the *hacking interval*, which is the range of a numerical scientifi
 
 Hacking intervals come in two varieties:
 
--   **Prescriptively-constrained** hacking intervals find the range of results over a user-defined set of reasonable manipulations. This provides explicit robustness to manipulations like: + Removing an outlier. + Adding/removing a feature. + Adding an interaction term. + Adding a transformation of a feature (like `x^2`).
--   **Tethered** hacking intervals find the range of results over the set of models that fit the data well, supposing that each model could be obtained by an unidentified manipulation. This provides robustness to *any* manipulation, including ones difficult for optimization like: + Changing the values of covariates or outcomes. + Removing any number of observations. + Adding new observations or new features. + Changing hyperparameters.
+-   **Prescriptively-constrained** hacking intervals find the range of results over a user-defined set of reasonable manipulations. This provides explicit robustness to manipulations like:
+
+        +   Removing an outlier.
+        +   Adding/removing a feature.
+        +   Adding an interaction term. 
+        +   Adding a transformation of a feature (like `x^2`). 
+
+-   **Tethered** hacking intervals find the range of results over the set of models that fit the data well, supposing that each model could be obtained by an unidentified manipulation. This provides robustness to *any* manipulation, including ones difficult for optimization like:
+
+        +   Changing the values of covariates or outcomes. 
+        +   Removing any number of observations.
+        +   Adding new observations or new features.
+        +   Changing hyperparameters.  
 
 This package computes tethered and prescriptively-constrained hacking intervals for linear models, as well as an interval that considers both types of hacking at once.
 
