@@ -24,13 +24,6 @@ We introduce the *hacking interval*, which is the range of a numerical scientifi
 
 Hacking intervals come in two varieties:
 
-2. Second item on our numbered list
-    * a bullet point:
-        * Now with a sub-list to our sub-list
-            * still with a sub-list to our sub-list
-    - a bullet point
-    + still a bullet point
-
 *	**Prescriptively-constrained** hacking intervals find the range of results over a user-defined set of reasonable manipulations. This provides explicit robustness to manipulations like:
     * Removing an outlier.
     * Adding/removing a feature.
