@@ -44,7 +44,7 @@ hackint_lm <- function(mdl, data, theta = 0.05, frac_remove_obs = 1, verbose=TRU
   if (frac_remove_obs == 1){
     remove_obs_idx <- 1:n_obs
   } else {
-    remove_obs_idx <- order(cooks.distance(mdl), decreasing = TRUE)[1:round(frac_remove_obs*n_obs)]
+    remove_obs_idx <- order(stats::cooks.distance(mdl), decreasing = TRUE)[1:round(frac_remove_obs*n_obs)]
   }
 
   hacks_obs = data.frame(type='remove_obs', row_idx = remove_obs_idx, stringsAsFactors = FALSE) %>%
@@ -115,7 +115,7 @@ hackint_lm <- function(mdl, data, theta = 0.05, frac_remove_obs = 1, verbose=TRU
     dplyr::select(type, manipulation, LB, Estimate, UB) %>%
     dplyr::mutate(largest_diff = pmax(abs(beta_0-LB), abs(UB-beta_0))) %>%
     dplyr::arrange(dplyr::desc(largest_diff)) %>%
-    select(modification, everything())
+    dplyr::select(manipulation, dplyr::everything())
 
 
   # Print results ----------
@@ -124,14 +124,14 @@ hackint_lm <- function(mdl, data, theta = 0.05, frac_remove_obs = 1, verbose=TRU
     data.frame(
       result = 'Tethered (LB):',
       value=hi_0['LB'],
-      manipulation=NA,
+      manipulation='Tethered',
       stringsAsFactors = FALSE
     ),
 
     data.frame(
       result = 'Tethered (UB):',
       value=hi_0['UB'],
-      manipulation=NA,
+      manipulation='Tethered',
       stringsAsFactors = FALSE
     ),
 
@@ -148,12 +148,14 @@ hackint_lm <- function(mdl, data, theta = 0.05, frac_remove_obs = 1, verbose=TRU
     hacks_all %>%
       dplyr::top_n(-1, LB) %>%
       dplyr::mutate(result = 'Constrained+Tethered (LB):') %>%
-      dplyr::select(result, value=LB, manipulation),
+      dplyr::select(result, value=LB, manipulation) %>%
+      dplyr::mutate(manipulation = paste(manipulation,'+ Tethered')),
 
     hacks_all %>%
       dplyr::top_n(1, UB) %>%
       dplyr::mutate(result = 'Constrained+Tethered (UB):') %>%
-      dplyr::select(result, value=UB, manipulation)
+      dplyr::select(result, value=UB, manipulation) %>%
+      dplyr::mutate(manipulation = paste(manipulation,'+ Tethered'))
 
   )
 
