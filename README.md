@@ -73,9 +73,7 @@ output <- hackint_lm(mdl, data, theta=0.1)
 #> 6 Constrained+Tethered (UB):  0.9234986      Add variable Z.2 + Tethered
 ```
 
-In the output above, `LB` and `UB` stand for lower bound and upper bound. It says that a tethered hacking interval around the base model is (-0.29, 0.82), a prescriptively constrained hacking interval around the base model is (0.16, 0.35), and a hacking interval that considers both types hacking is (-0.4, 0.92).
-
-Notice either of the tethered intervals are wider than the standard confidence interval, (-0.26, 0.8).
+In the output above, `LB` and `UB` stand for lower bound and upper bound. It says that a tethered hacking interval around the base model is (-0.29, 0.82), a prescriptively constrained hacking interval around the base model is (0.16, 0.35), and a hacking interval that considers both types hacking is (-0.4, 0.92). Notice either of the tethered intervals are wider than the standard confidence interval, (-0.26, 0.8).
 
 `hackint_lm` also returns the full list of all the manipulations that were tried, the minimum-loss estimate `Estimate` for each manipulation, and the tethered hacking interval `(LB,UB)` around each. The output is sorted by the largest absolute difference `largest_diff` of any value (`LB`, `Estimate`, or `UB`) from `beta_0`:
 

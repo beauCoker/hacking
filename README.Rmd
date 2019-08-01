@@ -76,9 +76,7 @@ library(hacking)
 output <- hackint_lm(mdl, data, theta=0.1)
 ```
 
-In the output above, `LB` and `UB` stand for lower bound and upper bound. It says that a tethered hacking interval around the base model is (`r trunc(output$tethered*100)/100`), a prescriptively constrained hacking interval around the base model is (`r trunc(output$constrained*100)/100`), and a hacking interval that considers both types hacking is (`r trunc(output$tethered_and_constrained*100)/100`). 
-
-Notice either of the tethered intervals are wider than the standard confidence interval, (`r trunc(confint(mdl)['w',]*100)/100`). 
+In the output above, `LB` and `UB` stand for lower bound and upper bound. It says that a tethered hacking interval around the base model is (`r trunc(output$tethered*100)/100`), a prescriptively constrained hacking interval around the base model is (`r trunc(output$constrained*100)/100`), and a hacking interval that considers both types hacking is (`r trunc(output$tethered_and_constrained*100)/100`). Notice either of the tethered intervals are wider than the standard confidence interval, (`r trunc(confint(mdl)['w',]*100)/100`). 
 
 `hackint_lm` also returns the full list of all the manipulations that were tried, the minimum-loss estimate `Estimate` for each manipulation, and the tethered hacking interval `(LB,UB)` around each. The output is sorted by the largest absolute difference `largest_diff` of any value (`LB`, `Estimate`, or `UB`) from `beta_0`:
 
