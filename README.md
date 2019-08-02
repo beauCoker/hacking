@@ -1,5 +1,5 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-**NOTE: This is a toy package created for expository purposes. It is not intended to be used for any other purpose.**
+**NOTE: This package is still in development. It is not intended for use yet.**
 
 ### Hacking intervals
 
@@ -73,9 +73,9 @@ output <- hackint_lm(mdl, data, theta=0.1)
 #> 6 Constrained+Tethered (UB):  0.9234986      Add variable Z.2 + Tethered
 ```
 
-In the output above, `LB` and `UB` stand for lower bound and upper bound. It says that a tethered hacking interval around the base model is (-0.29, 0.82), a prescriptively constrained hacking interval around the base model is (0.16, 0.35), and a hacking interval that considers both types hacking is (-0.4, 0.92). Notice either of the tethered intervals are wider than the standard confidence interval, (-0.26, 0.8).
+In the output above, `LB` and `UB` stand for lower bound and upper bound. It says that a tethered hacking interval around the base model is (-0.29, 0.82), a prescriptively constrained hacking interval around the base model is (0.16, 0.35), and a hacking interval that considers both types hacking is (-0.4, 0.92). Notice either of the tethered intervals are wider than the standard confidence interval, (-0.26, 0.8), but note that hacking intervals and standard confidence invervals measure different forms of uncertainty. Either could be larger, and hacking intervals needn't even be centered on the point estimate.
 
-`hackint_lm` also returns the full list of all the manipulations that were tried, the minimum-loss estimate `Estimate` for each manipulation, and the tethered hacking interval `(LB,UB)` around each. The output is sorted by the largest absolute difference `largest_diff` of any value (`LB`, `Estimate`, or `UB`) from `beta_0`:
+`hackint_lm` works by enumerating all of the manipulations within the prescriptive constraints and, for each manipulation, computing the ordinary least squares coefficient estimate as well as a thethered hacking interval around this estimate (i.e., where the model under the manipulation is essentially treated as a new base model). This complete list is available as a dataframe, with `Estimate` denoting the coefficient estimate and (`LB`,`UB`) denoting the tethered hacking interval. The prescriptively-constrained hacking interval is the range of `Estimate` and the type that considers prescriptive constraints *and* tethering is given by the mininum of `LB` and the maximum of `UB`. This list is useful for diagosing which manipulations are most impactful. The output is sorted by the largest absolute difference `largest_diff` of any value (`LB`, `Estimate`, or `UB`) from `beta_0`:
 
 ``` r
 head(output$hacks_all)
