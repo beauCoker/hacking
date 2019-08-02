@@ -78,16 +78,21 @@ In the output above, `LB` and `UB` stand for lower bound and upper bound. It say
 `hackint_lm` works by enumerating all of the manipulations within the prescriptive constraints and, for each manipulation, computing the ordinary least squares coefficient estimate as well as a thethered hacking interval around this estimate (i.e., where the model under the manipulation is essentially treated as a new base model). This complete list is available as a dataframe, with `Estimate` denoting the coefficient estimate and (`LB`,`UB`) denoting the tethered hacking interval. The prescriptively-constrained hacking interval is the range of `Estimate` and the type that considers prescriptive constraints *and* tethering is given by the mininum of `LB` and the maximum of `UB`. This list is useful for diagosing which manipulations are most impactful. The output is sorted by the largest absolute difference `largest_diff` of any value (`LB`, `Estimate`, or `UB`) from `beta_0`:
 
 ``` r
-head(output$hacks_all)
-#> # A tibble: 6 x 6
-#>   manipulation          type           LB Estimate    UB largest_diff
-#>   <chr>                 <chr>       <dbl>    <dbl> <dbl>        <dbl>
-#> 1 Remove observation 29 remove_obs -0.401    0.168 0.737        0.671
-#> 2 Add variable Z.2      add_term   -0.222    0.351 0.923        0.654
-#> 3 Remove observation 35 remove_obs -0.373    0.192 0.757        0.643
-#> 4 Remove observation 13 remove_obs -0.200    0.351 0.901        0.632
-#> 5 Remove observation 3  remove_obs -0.199    0.350 0.899        0.629
-#> 6 Remove observation 30 remove_obs -0.256    0.318 0.892        0.622
+output$hacks_all
+#> # A tibble: 60 x 6
+#>    manipulation          type           LB Estimate    UB largest_diff
+#>    <chr>                 <chr>       <dbl>    <dbl> <dbl>        <dbl>
+#>  1 Remove observation 29 remove_obs -0.401    0.168 0.737        0.671
+#>  2 Add variable Z.2      add_term   -0.222    0.351 0.923        0.654
+#>  3 Remove observation 35 remove_obs -0.373    0.192 0.757        0.643
+#>  4 Remove observation 13 remove_obs -0.200    0.351 0.901        0.632
+#>  5 Remove observation 3  remove_obs -0.199    0.350 0.899        0.629
+#>  6 Remove observation 30 remove_obs -0.256    0.318 0.892        0.622
+#>  7 Remove observation 48 remove_obs -0.227    0.332 0.891        0.622
+#>  8 Remove observation 41 remove_obs -0.349    0.199 0.747        0.619
+#>  9 Remove observation 32 remove_obs -0.220    0.330 0.881        0.611
+#> 10 Remove observation 24 remove_obs -0.241    0.320 0.880        0.610
+#> # … with 50 more rows
 ```
 
 ### Other functionality
