@@ -31,7 +31,7 @@ hackint_lm <- function(mdl, data, treatment, theta = 0.1, frac_remove_obs = 1, v
   if (class(mdl) != "lm") stop("'mdl' must be of class 'lm'")
   if (theta <= 0) stop("'theta' must be > 0")
   if (frac_remove_obs < 0 || frac_remove_obs>1) stop("'frac_remove_obs' must be between 0 and 1")
-  if (any(unique(data[treatment]) != c(1,0))) stop("treatment variable must have values 1 and 0 only")
+  if (!all(unique(data[[treatment]]) %in% c(0,1))) stop("treatment variable must have values 1 and 0 only")
 
   ## base model data
   SSE_0 <- sum(mdl$residuals^2)
