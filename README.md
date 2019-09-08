@@ -1,6 +1,4 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-**NOTE: This package is still in development. It is not intended for use yet.**
-
 ### Hacking intervals
 
 "Could a different reasonable researcher analyzing the same data come to a different conclusion?" This is a question that gets to the heart of whether or not a scientific result can be trusted, yet it's a question that traditional statistical inference has little to say about.
@@ -11,7 +9,7 @@ We introduce the *hacking interval*, which is the range of a numerical scientifi
     -   Removing an outlier.
     -   Adding/removing a feature.
     -   Adding an interaction term.
-    -   Adding a transformation of a feature (like `x^2`).
+    -   Adding a transformation of a feature (this package implements `x^2` and discretizing continuous variables into indicator variables based on quantiles).
 -   **Tethered** hacking intervals find the range of results over the set of models that fit the data well compared to a "base" model, supposing that each such model could be obtained by an unidentified manipulation. This provides robustness to *any* manipulation, including ones difficult for optimization like:
     -   Changing the values of covariates or outcomes.
     -   Removing any number of observations.
@@ -63,7 +61,7 @@ Now we get to the hacking interval part. What if instead you ask, "what if the s
 
 ``` r
 library(hacking)
-output <- hackint_lm(mdl, data, theta=0.1)
+output <- hackint_lm(mdl, data, theta=0.1, treatment = 'w')
 #>                       result      value                     manipulation
 #> 1             Tethered (LB): -0.2901996                         Tethered
 #> 2             Tethered (UB):  0.8294442                         Tethered
@@ -79,7 +77,7 @@ In the output above, `LB` and `UB` stand for lower bound and upper bound. It say
 
 ``` r
 output$hacks_all
-#> # A tibble: 60 x 6
+#> # A tibble: 62 x 6
 #>    manipulation          type           LB Estimate    UB largest_diff
 #>    <chr>                 <chr>       <dbl>    <dbl> <dbl>        <dbl>
 #>  1 Remove observation 29 remove_obs -0.401    0.168 0.737        0.671
@@ -92,7 +90,7 @@ output$hacks_all
 #>  8 Remove observation 41 remove_obs -0.349    0.199 0.747        0.619
 #>  9 Remove observation 32 remove_obs -0.220    0.330 0.881        0.611
 #> 10 Remove observation 24 remove_obs -0.241    0.320 0.880        0.610
-#> # … with 50 more rows
+#> # … with 52 more rows
 ```
 
 ### Other functionality

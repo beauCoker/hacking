@@ -4,23 +4,38 @@
 \alias{hackint_lm}
 \title{Hacking intervals for linear models}
 \usage{
-hackint_lm(mdl, data, theta = 0.05, frac_remove_obs = 1,
+hackint_lm(mdl, data, treatment, theta = 0.1, frac_remove_obs = 1,
   verbose = TRUE)
 }
 \arguments{
-\item{mdl}{model}
+\item{mdl}{\code{lm} object representing the "base" model}
 
-\item{data}{dataframe}
+\item{data}{\code{data.frame} used to fit \code{mdl}}
 
-\item{theta}{numeric}
+\item{treatment}{name of binary treatment variable (inputted as \code{character})}
 
-\item{frac_remove_obs}{numeric}
+\item{theta}{loss tolerance for tethered hacking (default = 0.1)}
 
-\item{verbose}{boolean}
+\item{frac_remove_obs}{fraction of observations to consider for removal (default = 1, meaning all observations considered)}
+
+\item{verbose}{whether or not to print summary}
 }
 \value{
-list
+\code{list} containing all hacking intervals (\code{tethered}, \code{constrained}, \code{tethered_and_constrained})
+as well as complete list of all manipulations applied to the base model (\code{hacks_all})
 }
 \description{
-Hacking intervals for linear models
+Computes tethered and constraint-based hacking intervals of the coefficient of a binary treatment variable in a linear model.
+See \url{https://github.com/beauCoker/hacking} for examples.
+}
+\examples{
+N = 50 # Number of observations
+data <- data.frame(
+  y = rnorm(N), # Response variable (continuous)
+  w = rbinom(N, 1, .5), # Treatment variable (binary)
+  X = matrix(rnorm(N*3), nrow=N), # Covariates included in base model
+  Z = matrix(rnorm(N*3), nrow=N) # Covariates excluded from base model
+)
+mdl <- lm(y ~ w + X.1*X.2, data=data) # fit linear "base" model
+output <- hackint_lm(mdl, data, theta=0.1, treatment = 'w')
 }

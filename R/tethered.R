@@ -1,13 +1,14 @@
 #' Tethered hacking interval for linear model
 #'
-#' @param mdl model
-#' @param theta numeric
+#' @param mdl \code{lm} object representing "base" model
+#' @param theta loss tolerance for tethered hacking (default = 0.1)
 #'
-#' @return vector
+#' @return vector with lower bound and upper bound of hacking interval (\code{LB} and \code{UB})
+#' as well as minimum loss estimate (\code{Estimate}).
 #' @export
 #'
 #' @examples
-tethered_lm <- function(mdl, theta=0.05){
+tethered_lm <- function(mdl, theta=0.1){
   SSE <- sum(mdl$residuals^2)
 
   t = sqrt((((1+theta)*SSE)/SSE-1)*mdl$df.residual)

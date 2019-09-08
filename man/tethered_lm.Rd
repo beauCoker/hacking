@@ -4,15 +4,16 @@
 \alias{tethered_lm}
 \title{Tethered hacking interval for linear model}
 \usage{
-tethered_lm(mdl, theta = 0.05)
+tethered_lm(mdl, theta = 0.1)
 }
 \arguments{
-\item{mdl}{model}
+\item{mdl}{\code{lm} object representing "base" model}
 
-\item{theta}{numeric}
+\item{theta}{loss tolerance for tethered hacking (default = 0.1)}
 }
 \value{
-vector
+vector with lower bound and upper bound of hacking interval (\code{LB} and \code{UB})
+as well as minimum loss estimate (\code{Estimate}).
 }
 \description{
 Tethered hacking interval for linear model

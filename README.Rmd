@@ -14,8 +14,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-**NOTE: This package is still in development. It is not intended for use yet.**
-
 ### Hacking intervals
 
 "Could a different reasonable researcher analyzing the same data come to a different conclusion?" This is a question that gets to the heart of whether or not a scientific result can be trusted, yet it's a question that traditional statistical inference has little to say about. 
@@ -26,7 +24,7 @@ We introduce the *hacking interval*, which is the range of a numerical scientifi
     * Removing an outlier.
     * Adding/removing a feature.
     * Adding an interaction term. 
-    * Adding a transformation of a feature (like `x^2`). 
+    * Adding a transformation of a feature (this package implements `x^2` and discretizing continuous variables into indicator variables based on quantiles). 
 *	**Tethered** hacking intervals find the range of results over the set of models that fit the data well compared to a "base" model, supposing that each such model could be obtained by an unidentified manipulation. This provides robustness to *any* manipulation, including ones difficult for optimization like:
     * Changing the values of covariates or outcomes. 
     * Removing any number of observations.
@@ -73,7 +71,7 @@ Now we get to the hacking interval part. What if instead you ask, "what if the s
 
 ```{r}
 library(hacking)
-output <- hackint_lm(mdl, data, theta=0.1)
+output <- hackint_lm(mdl, data, theta=0.1, treatment = 'w')
 ```
 
 In the output above, `LB` and `UB` stand for lower bound and upper bound. It says that a tethered hacking interval around the base model is (`r trunc(output$tethered*100)/100`), a prescriptively constrained hacking interval around the base model is (`r trunc(output$constrained*100)/100`), and a hacking interval that considers both types hacking is (`r trunc(output$tethered_and_constrained*100)/100`). Notice either of the tethered intervals are wider than the standard confidence interval, (`r trunc(confint(mdl)['w',]*100)/100`), but note that hacking intervals and standard confidence invervals measure different forms of uncertainty. Either could be larger, and hacking intervals needn't even be centered on the point estimate. 
