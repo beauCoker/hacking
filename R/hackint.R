@@ -78,10 +78,15 @@ hackint_lm <- function(mdl, data, treatment, theta = 0.1, frac_remove_obs = 1, v
   hacks_discretize = data.frame(type='discretize', term = terms_linear_numeric_included, stringsAsFactors = FALSE) %>%
     dplyr::mutate(manipulation = paste0("Discretize variable ",term))
 
+  if (length(terms_linear_included) > 1){
   hacks_interaction = data.frame(type='interaction',
                                  term1 = t(utils::combn(terms_linear_included,2))[,1],
                                  term2 = t(utils::combn(terms_linear_included,2))[,2], stringsAsFactors = FALSE) %>%
     dplyr::mutate(manipulation = sprintf("Adding %s:%s term", term1, term2))
+  } else{
+    hacks_interaction <- data.frame(type=NA, row_idx=NA, manipulation=NA, LB=NA, Estimate=NA, UB=NA)
+    hacks_interaction <- hacks_obs[0,]
+  }
 
   if (frac_remove_obs > 0) {
     hacks_obs = data.frame(type='remove_obs', row_idx = remove_obs_idx, stringsAsFactors = FALSE) %>%
@@ -116,6 +121,7 @@ hackint_lm <- function(mdl, data, treatment, theta = 0.1, frac_remove_obs = 1, v
     dplyr::select(-hi)
 
   # Interaction term ----------
+  if (length(terms_linear_included) > 1) {
   hacks_interaction <- hacks_interaction %>%
     dplyr::group_by(term1, term2) %>%
     dplyr::mutate(f = list(stats::update(formula_0, sprintf('.~. +%s:%s',term1,term2)))) %>%
@@ -125,6 +131,7 @@ hackint_lm <- function(mdl, data, treatment, theta = 0.1, frac_remove_obs = 1, v
                   Estimate = purrr::map_dbl(hi,'Estimate'),
                   UB = purrr::map_dbl(hi,'UB')) %>%
     dplyr::select(-hi)
+  }
 
   # Transformation ----------
   hacks_transformation <- hacks_transformation %>%
